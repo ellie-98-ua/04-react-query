@@ -11,7 +11,9 @@ export default function SearchForm({ onSubmit }: SearchFormProps) {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (value.trim()) onSubmit(value.trim());
+    const trimmed = value.trim();
+    if (trimmed) onSubmit(trimmed);
+    setValue("");
   };
 
   return (

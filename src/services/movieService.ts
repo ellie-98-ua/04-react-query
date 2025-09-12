@@ -8,12 +8,19 @@ export const fetchMovies = async (
   query: string,
   page: number
 ): Promise<MoviesResponse> => {
+  if (!query) {
+    return { page: 1, results: [], total_pages: 0, total_results: 0 };
+  }
+
   const response = await axios.get<MoviesResponse>(`${BASE_URL}/search/movie`, {
     params: {
       api_key: API_KEY,
       query,
       page,
+      include_adult: false,
+      language: "en-US",
     },
   });
+
   return response.data;
 };

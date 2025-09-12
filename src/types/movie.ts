@@ -10,4 +10,5 @@ export interface MoviesResponse {
   results: Movie[];
   total_pages: number;
   page: number;
+  total_results: number;
 }
