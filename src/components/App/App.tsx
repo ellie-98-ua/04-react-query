@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import ReactPaginate from "react-paginate";
+import { Toaster, toast } from "react-hot-toast";
 import SearchForm from "../SearchForm/SearchForm";
 import MovieGrid from "../MovieGrid/MovieGrid";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
 import { fetchMovies } from "../../services/movieService";
-import type { Movie, MoviesResponse } from "../../types/movie";
+
+import type { Movie } from "../../types/movie";
+import type { MoviesResponse } from "../../services/movieService";
+
 import css from "./App.module.css";
 
 export default function App() {
@@ -15,7 +19,7 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, error } = useQuery<MoviesResponse>({
+  const { data, isFetching, isError, isSuccess, error } = useQuery<MoviesResponse>({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
     enabled: query.length > 0,
@@ -24,6 +28,12 @@ export default function App() {
 
   const movies = data?.results || [];
   const totalPages = data?.total_pages || 0;
+
+  useEffect(() => {
+    if (isSuccess && movies.length === 0) {
+      toast("No movies found for your query");
+    }
+  }, [isSuccess, movies]);
 
   const handleSelectMovie = (movie: Movie) => {
     setSelectedMovie(movie);
@@ -44,9 +54,12 @@ export default function App() {
         }}
       />
 
-      {isLoading && <Loader />}
-      {error instanceof Error && <ErrorMessage message={error.message} />}
-      
+      {isFetching && query && <Loader />}
+
+      {isError && error instanceof Error && (
+        <ErrorMessage message={error.message} />
+      )}
+
       {movies.length > 0 && (
         <MovieGrid movies={movies} onSelect={handleSelectMovie} />
       )}
@@ -68,6 +81,8 @@ export default function App() {
           previousLabel="←"
         />
       )}
+
+      <Toaster position="top-right" />
     </div>
   );
 }
