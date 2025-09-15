@@ -5,10 +5,3 @@ export interface Movie {
   release_date: string;
   overview: string;
 }
-
-export interface MoviesResponse {
-  results: Movie[];
-  total_pages: number;
-  page: number;
-  total_results: number;
-}
